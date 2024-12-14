@@ -1,24 +1,20 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import 'react-native-reanimated';
 
+import { isLoggedIn } from '@/authService';
 import { useColorScheme } from '@/components/useColorScheme';
 
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from 'expo-router';
+export { ErrorBoundary } from 'expo-router';
 
 export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
   initialRouteName: '(tabs)',
 };
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -27,10 +23,7 @@ export default function RootLayout() {
     ...FontAwesome.font,
   });
 
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
-  useEffect(() => {
-    if (error) throw error;
-  }, [error]);
+  if (error) throw error;
 
   useEffect(() => {
     if (loaded) {
@@ -42,17 +35,49 @@ export default function RootLayout() {
     return null;
   }
 
-  return <RootLayoutNav />;
+  return <RootNavigation />;
 }
 
-function RootLayoutNav() {
+function RootNavigation() {
   const colorScheme = useColorScheme();
+  const [authenticated, setAuthenticated] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      const loggedIn = await isLoggedIn();
+      setAuthenticated(loggedIn);
+
+      // Redirect to login if not authenticated
+      if (!loggedIn) {
+        router.replace('/(tabs)/login');
+      }
+    };
+
+    checkAuthStatus();
+  }, []);
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+      <Stack
+        screenOptions={{
+          headerShown: false, // Globally hide headers unless specified
+        }}
+      >
+        {authenticated ? (
+          <>
+            {/* Authenticated user screens */}
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+          </>
+        ) : (
+          <>
+            {/* Unauthenticated user screens */}
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="(tabs)/login" options={{ title: 'Login', headerShown: true }} />
+            <Stack.Screen name="(tabs)/register" options={{ title: 'Register', headerShown: true }} />
+          </>
+        )}
       </Stack>
     </ThemeProvider>
   );
