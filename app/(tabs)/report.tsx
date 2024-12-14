@@ -80,40 +80,40 @@ export default function Reports() {
   };
 
   // Generate XML for sensor data
-  const generateXMLForSensorData = (dataPoints) => {
-    const xmlHeader = `<?xml version="1.0" encoding="UTF-8"?>\n`;
-    const rootStart = `<SensorData>\n`;
-    const rootEnd = `</SensorData>`;
-    const dataPointsXML = dataPoints
-      .map(
-        (point) =>
-          `  <DataPoint>\n    <Frequency>${point.current_frequency}</Frequency>\n    <Intensity>${point.current_intensity}</Intensity>\n    <Timestamp>${point.current_timestamp.toDate()}</Timestamp>\n  </DataPoint>\n`
-      )
-      .join("");
-    return xmlHeader + rootStart + dataPointsXML + rootEnd;
-  };
+const generateXMLForSensorData = (dataPoints) => {
+  const xmlHeader = `<?xml version="1.0" encoding="UTF-8"?>\n`;
+  const rootStart = `<SensorData>\n`;
+  const rootEnd = `</SensorData>`;
+  const dataPointsXML = dataPoints
+    .map(
+      (point) =>
+        `  <DataPoint>\n    <Frequency>${point.current_frequency}</Frequency>\n    <Intensity>${point.current_intensity}</Intensity>\n    <Timestamp>${point.current_timestamp.toDate()}</Timestamp>\n  </DataPoint>\n`
+    )
+    .join("");
+  return xmlHeader + rootStart + dataPointsXML + rootEnd;
+};
 
-  // Save and share XML file for a simulation
-  const exportSensorData = async () => {
-    const xmlData = generateXMLForSensorData(dataPoints);
-    const fileUri = `${FileSystem.documentDirectory}simulation_${selectedSimulation.id}_data.xml`;
+// Exports sensor data and saves to the device
+const exportSensorData = async () => {
+  const xmlData = generateXMLForSensorData(dataPoints);
+  const fileUri = `${FileSystem.documentDirectory}simulation_${selectedSimulation.id}_data.xml`;
 
-    try {
-      await FileSystem.writeAsStringAsync(fileUri, xmlData, {
-        encoding: FileSystem.EncodingType.UTF8,
-      });
-      Alert.alert("Success", "Sensor data exported successfully!");
+  try {
+    await FileSystem.writeAsStringAsync(fileUri, xmlData, {
+      encoding: FileSystem.EncodingType.UTF8,
+    });
+    Alert.alert("Success", "Sensor data exported successfully!");
 
-      if (await Sharing.isAvailableAsync()) {
-        await Sharing.shareAsync(fileUri);
-      } else {
-        Alert.alert("Sharing Not Available", "XML file saved to your device.");
-      }
-    } catch (error) {
-      Alert.alert("Error", "Failed to export sensor data.");
-      console.error(error);
+    if (await Sharing.isAvailableAsync()) {
+      await Sharing.shareAsync(fileUri);
+    } else {
+      Alert.alert("Sharing Not Available", "XML file saved to your device.");
     }
-  };
+  } catch (error) {
+    Alert.alert("Error", "Failed to export sensor data.");
+    console.error(error);
+  }
+};
 
   useEffect(() => {
     fetchSimulations();

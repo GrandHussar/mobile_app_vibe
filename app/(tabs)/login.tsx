@@ -1,30 +1,38 @@
-import React, { useState } from 'react';
-import { View, TextInput, Button, Alert, StyleSheet, Text, TouchableOpacity, ImageBackground } from 'react-native';
-import { useRouter } from 'expo-router';
-import { login } from '@/authService';
+import React, { useState } from "react";
+import {
+  View,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  StyleSheet,
+  Text,
+  ImageBackground,
+} from "react-native";
+import { useRouter } from "expo-router";
+import { login } from "@/authService";
 
 export default function Login() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
     try {
       await login(email, password);
-      Alert.alert('Success', 'Logged in successfully');
-      router.replace({ pathname: '/(tabs)' }); // Redirect to dashboard after login
+      Alert.alert("El Psy Congroo", "Logged in successfully");
+      router.replace({ pathname: "/(tabs)" });
     } catch (error) {
-      Alert.alert('Error', 'Invalid email or password');
+      Alert.alert("Error", "Invalid email or password");
     }
   };
 
   return (
     <ImageBackground
-      source={require('@/assets/images/steins_gate_background.jpg')} // Updated path to the background image
+      source={require("@/assets/images/steins_gate_background.jpg")}
       style={styles.background}
     >
       <View style={styles.container}>
-        <Text style={styles.title}>EL PSY CONGROO</Text>
+        <Text style={styles.title}>Enter Laboratory</Text>
 
         <TextInput
           placeholder="Email"
@@ -43,12 +51,15 @@ export default function Login() {
           style={styles.input}
         />
 
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.loginButtonText}>LOGIN</Text>
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+          <Text style={styles.buttonText}>LOGIN</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.registerButton} onPress={() => router.push({ pathname: '/(tabs)/register' })}>
-          <Text style={styles.registerButtonText}>REGISTER</Text>
+        <TouchableOpacity
+          style={styles.registerLink}
+          onPress={() => router.push({ pathname: "/(tabs)/register" })}
+        >
+          <Text style={styles.linkText}>Don't have an account? Register</Text>
         </TouchableOpacity>
       </View>
     </ImageBackground>
@@ -58,55 +69,54 @@ export default function Login() {
 const styles = StyleSheet.create({
   background: {
     flex: 1,
-    resizeMode: 'cover',
+    resizeMode: "cover",
   },
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 16,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)', // Dark overlay for readability
+    backgroundColor: "rgba(0, 0, 0, 0.8)", // Semi-transparent overlay
   },
   title: {
     fontSize: 32,
-    fontWeight: 'bold',
-    color: '#1B9AAA', // Neon cyan color for "EL PSY CONGROO"
+    color: "#1B9AAA",
+    fontWeight: "bold",
+    fontFamily: "monospace",
     marginBottom: 32,
-    fontFamily: 'monospace', // Monospace font for terminal style
   },
   input: {
-    width: '85%',
+    width: "85%",
     padding: 12,
-    marginVertical: 8,
+    marginVertical: 10,
     borderWidth: 1,
-    borderColor: '#1B9AAA', // Neon cyan border
+    borderColor: "#1B9AAA",
     borderRadius: 5,
-    backgroundColor: '#1C1C1C', // Dark background for input fields
-    color: '#E0E6ED', // Light text color for inputs
-    fontFamily: 'monospace',
-    fontSize: 16,
+    backgroundColor: "#1C1C1C",
+    color: "#E0E6ED",
+    fontFamily: "monospace",
   },
-  loginButton: {
-    width: '85%',
+  button: {
+    width: "85%",
     padding: 12,
-    marginTop: 16,
+    backgroundColor: "#1B9AAA",
+    alignItems: "center",
     borderRadius: 5,
-    backgroundColor: '#1B9AAA',
-    alignItems: 'center',
+    marginVertical: 16,
   },
-  loginButtonText: {
-    color: '#000',
+  buttonText: {
     fontSize: 16,
-    fontWeight: 'bold',
-    fontFamily: 'monospace',
+    color: "#000",
+    fontWeight: "bold",
+    fontFamily: "monospace",
   },
-  registerButton: {
+  registerLink: {
     marginTop: 16,
   },
-  registerButtonText: {
-    color: '#8F9AA3', // Subdued color for the "Register" text link
+  linkText: {
     fontSize: 14,
-    textDecorationLine: 'underline',
-    fontFamily: 'monospace',
+    color: "#8F9AA3",
+    textDecorationLine: "underline",
+    fontFamily: "monospace",
   },
 });
